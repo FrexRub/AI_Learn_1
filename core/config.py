@@ -9,3 +9,10 @@ class ConfigLLM(BaseSettings):
     openrouter_api_key: SecretStr
 
     model_config = SettingsConfigDict(env_file=BASE_DIR / ".env", env_file_encoding="utf8", extra="ignore")
+
+
+class Setting(BaseSettings):
+    llm: ConfigLLM = ConfigLLM()
+
+
+setting = Setting()
