@@ -40,7 +40,8 @@ class ChatAgent:
 
         return graph.compile()
 
-    def _input_user_node(self, state: ChatSate):
+    @staticmethod
+    def _input_user_node(state: ChatSate):
         user_input: str = input("Вы: ")
         if user_input in ("by", "exit", "пока"):
             return {"should_continue": False}
@@ -54,11 +55,12 @@ class ChatAgent:
         msg_content = response.content
 
         print("ИИ: ", msg_content)
-        print("type message: ", type(response))
+
         new_message = state["messages"] + [AIMessage(content=msg_content)]
         return {"messages": new_message}
 
-    def _should_continue(self, state: ChatSate) -> str:
+    @staticmethod
+    def _should_continue(state: ChatSate) -> str:
         return "continue" if state.get("should_continue", True) else "end"
 
     def classify(self):
@@ -73,13 +75,17 @@ class ChatAgent:
         }
 
         result = self.workflow.invoke(initial_state)
-        return result
+        return {
+            "messages": result["messages"],
+            "should_continue": result["should_continue"],
+        }
 
 
 if __name__ == "__main__":
     print("Добро пожаловать в чат с ИИ!")
     print("Для выхода используйте слова: by, exit, пока")
     print("-" * 50)
+    res = None
     try:
         app = ChatAgent()
         res = app.classify()
@@ -88,3 +94,7 @@ if __name__ == "__main__":
     else:
         print("До свидания")
 
+    if res:
+        messages_text = [msg.content for msg in res["messages"]]
+        print(f"Все сообщения:\n{'\n'.join(messages_text)}")
+        print(f"state: {res["should_continue"]}")
